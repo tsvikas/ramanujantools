@@ -23,14 +23,15 @@ dependencies = [
     "python-flint>=0.7.0",
 ]
 
-[project.optional-dependencies]
-dev = ["pytest>=8.2.0"]
+[dependency-groups]
+dev = [
+    "pytest>=8.2.0",
+]
 
 [tool.pytest.ini_options]
 python_files = "*_test.py"
 testpaths = ["ramanujantools"]
-[project.urls]
 
+[project.urls]
 Homepage = "https://www.ramanujanmachine.com/"
 Repository = "https://github.com/RamanujanMachine/ramanujantools"
-
