@@ -70,7 +70,7 @@ class CMF:
         return r"\begin{array}{l}" + r"\\ ".join(lines) + r"\end{array}"
 
     def _repr_latex_(self) -> str:
-        return rf"{sp.latex(self)}"
+        return rf"${sp.latex(self)}$"
 
     def __getstate__(self):
         return self.matrices

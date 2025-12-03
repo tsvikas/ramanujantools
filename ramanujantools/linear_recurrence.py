@@ -107,7 +107,7 @@ class LinearRecurrence:
         return f"{printer.doprint(self._symbolic_relation())} = 0"
 
     def _repr_latex_(self) -> str:
-        return rf"{sp.latex(self)}"
+        return rf"${sp.latex(self)}$"
 
     def _symbolic_relation(self) -> sp.Expr:
         terms = [
