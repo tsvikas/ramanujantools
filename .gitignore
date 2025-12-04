@@ -7,3 +7,5 @@ build
 __pycache__
 dist/
 build/
+.virtual_documents/
+.ipynb_checkpoints/
