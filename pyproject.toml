@@ -22,15 +22,50 @@ dependencies = [
     "python-flint>=0.7.0",
 ]
 
+[project.urls]
+Homepage = "https://www.ramanujanmachine.com/"
+Repository = "https://github.com/RamanujanMachine/ramanujantools"
+
 [dependency-groups]
-dev = [
+dev = []
+debug = [
+    "icecream>=2",
+]
+testing = [
     "pytest>=8.2.0",
 ]
+terminal = [
+    "euporie",
+    "ipython",
+]
+jupyter = [
+    "ipympl",
+    # "jupyter-ai[all]",  # errors
+    # "jupyter-collaboration",  # too much logs
+    "jupyterlab~=4.0",
+    "jupyterlab-code-formatter",
+    "jupyterlab-git",
+    "jupyterlab-github",
+    # "jupyterlab-latex",  # not used
+    "jupyterlab-myst",
+    "jupytext",
+    "nbconvert[webpdf]",
+    "pandoc",
+]
+formatters = [
+    "isort",
+    "black",
+]
+lsp = [
+    "pyright",
+    "python-lsp-server",
+    # "python-language-server",  # outdated
+]
+
+
+[tool.uv]
+default-groups = ["dev", "testing", "terminal", "jupyter", "formatters", "lsp"]
 
 [tool.pytest.ini_options]
 python_files = "*_test.py"
 testpaths = ["ramanujantools"]
-
-[project.urls]
-Homepage = "https://www.ramanujanmachine.com/"
-Repository = "https://github.com/RamanujanMachine/ramanujantools"
