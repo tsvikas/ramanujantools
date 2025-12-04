@@ -1,6 +1,8 @@
 # Ramanujantools Tutorial: From Basics to Research Applications
 
+
 A hands-on guide to learning the ramanujantools package from scratch.
+
 
 ## Table of Contents
 
@@ -13,11 +15,11 @@ A hands-on guide to learning the ramanujantools package from scratch.
 7. [Module 6: Complete Analysis Workflow](#module-6-complete-analysis-workflow)
 8. [Quick Reference](#quick-reference)
 
----
 
 ## Introduction
 
-**What is ramanujantools?**
+
+### What is ramanujantools?
 
 Ramanujantools is a Python research library developed by the Ramanujan Machine project at Technion. It provides tools for:
 
@@ -26,46 +28,57 @@ Ramanujantools is a Python research library developed by the Ramanujan Machine p
 - **Linear Recurrences**: Sequences satisfying polynomial recurrence relations
 - **Irrationality Measures**: Analyzing convergence quality and proving irrationality
 
-**Who should use this tutorial?**
+### Who should use this tutorial?
 
 - Mathematicians exploring continued fractions
 - Researchers in number theory and special functions
 - Anyone interested in computational mathematics
 - Students learning about mathematical constants
 
-**Prerequisites:**
+### Prerequisites:
 
 - Basic Python knowledge
 - Familiarity with mathematical notation (matrices, continued fractions helpful but not required)
 - SymPy awareness is helpful
 
----
+
+editor notes start and end with <<<, you shold fix them
+eveloper notes start and end with ^^^, you should keep them in the docs - they are question to the developer team
+
 
 ## Module 1: Setup and First Steps
 
+
 ### Installation
+
 
 First, install the package:
 
-```bash
+<!-- #region -->
+<<<
+editor notes: encorage the user to install the package in a venv, managed with one of the common tools today (list them)
+than give examples with uv
+<<<
+
+```bash 
 pip install ramanujantools
 ```
 
-For development with test dependencies:
+For development with test dependencies: <<< this was changed, will not work anymore. fix here and in the README/CLAUDE file <<<
 
 ```bash
 pip install ramanujantools[dev]
 ```
+<!-- #endregion -->
 
 ### Basic Imports
+
 
 Import the core classes you'll use throughout:
 
 ```python
 # Core imports - you'll use these constantly
-from ramanujantools import Position, Matrix, Limit, LinearRecurrence
-from ramanujantools.pcf import PCF
-from ramanujantools.cmf import CMF, known_cmfs
+from ramanujantools import Position, Matrix, Limit, LinearRecurrence, PCF, CMF, known_cmfs
 
 # Sympy for symbolic math
 import sympy as sp
@@ -74,87 +87,136 @@ from sympy.abc import x, y, z, n
 # Set up nice printing
 sp.init_printing()
 
-print("✓ All imports successful!")
 print(f"Sympy version: {sp.__version__}")
 ```
 
+<<< we need a short ibtro to sympy and to mpf.
+
+
 ### Lesson 1.1: Position Objects
+
 
 Position objects represent points in multi-dimensional space. They're used throughout the package for matrix substitutions.
 
-**Basic Operations:**
+
+#### Basic Operations:
 
 ```python
 # Create a simple position
 p1 = Position({x: 5, y: 3})
-print("Position 1:", p1)
+print(p1)
+print(repr(p1))
+p1
+```
 
+```python
 # Vector addition
 p2 = Position({x: 2, y: 7})
 p_sum = p1 + p2
 print("Sum:", p_sum)  # Position({x: 7, y: 10})
+```
 
+```python
 # Scalar multiplication
 p_scaled = 3 * p1
 print("Scaled:", p_scaled)  # Position({x: 15, y: 9})
-
-# Useful methods
-print("Longest value:", p1.longest())    # Maximum absolute value: 5
-print("Shortest value:", p1.shortest())  # Minimum absolute value: 3
-print("Signs:", p1.signs())              # Position({x: 1, y: 1})
 ```
 
-**Symbolic Positions:**
+```python
+Position({x: 5, y: 3, z: -6}).longest()  # 6
+```
+
+```python
+Position({x: 5, y: 3, z: -6}).shortest()  # 3
+```
+
+```python
+Position({x: 5, y: -3, z: 0}).signs()  # {x: 1, y: -1, z: 0}
+```
+
+```python
+# equlaity works
+Position({x:1}) == Position({x:1})
+```
+
+```python
+# notice that this doesnt work. ^^^ should we fix it? or at least verify that the keys are sympy symbols? ^^^
+Position(x=1) == Position({x:1})
+```
+
+#### Symbolic Positions:
 
 ```python
 # Positions can contain symbolic expressions
 p_symbolic = Position({x: n**2 + 3, y: 2*n})
-print("Symbolic position:", p_symbolic)
+p_symbolic
+```
 
+```python
 # Check if it's polynomial
-print("Is polynomial?", p_symbolic.is_polynomial())  # True
+p_symbolic.is_polynomial()  # True
+```
 
+```python
 # Check if it's integer
 p_integer = Position({x: 5, y: -7})
-print("Is integer?", p_integer.is_integer())  # True
+p_integer.is_integer()  # True
 ```
 
 **Key Takeaway:** Positions are like dictionaries that support mathematical operations. They're the foundation for matrix substitutions.
 
----
 
 ## Module 2: Matrix Fundamentals
 
+
 ### Lesson 2.1: Matrix Basics
+
 
 The Matrix class extends sympy.Matrix with specialized functionality for continued fractions and convergence analysis.
 
-**Creating Matrices:**
+
+<<<
+OK, so what do I need to know about sp.Matrix? 
+some of it is below - we need to be clear what is from sp and what did we add
+<<<
+
+^^^why extend and not use directly? what is this adding to us?^^^
+
+
+#### Creating Matrices:
 
 ```python
 # Basic matrix
 m = Matrix([[1, 2], [3, 4]])
-print("Basic matrix:")
 print(m)
+m
+```
 
+```python
 # Matrix properties
 print(f"Is square? {m.is_square()}")
 print(f"Determinant: {m.det()}")
 ```
 
-**Symbolic Matrices:**
+#### Symbolic Matrices:
 
 ```python
 # Create a symbolic matrix
 m_symbolic = Matrix([[x, x**2], [1, x + 1]])
-print("Symbolic matrix:")
-print(m_symbolic)
+m_symbolic
+```
 
+```python
+m_symbolic.det()
+```
+
+```python
 # Substitute values (this uses fast xreplace internally)
-m_sub = m_symbolic.subs({x: 5})
-print("\nAfter substituting x=5:")
-print(m_sub)
+m_symbolic.subs({x: 5})
 
+```
+
+```python
 # Try different values
 for val in [1, 2, 10]:
     result = m_symbolic.subs({x: val})
@@ -163,13 +225,15 @@ for val in [1, 2, 10]:
 
 ### Lesson 2.2: The Walk Operation
 
+
 **This is the most important operation in the entire package.**
 
 The `walk()` method computes the product of matrices along a trajectory:
 
 **M(start) · M(start+trajectory) · M(start+2·trajectory) · ... · M(start+n·trajectory)**
 
-**Single Walk Example:**
+
+#### Single Walk Example:
 
 ```python
 # Simple 1D example with variable n
@@ -177,36 +241,37 @@ m = Matrix([[0, n], [1, n]])  # This matrix is crucial for PCFs!
 
 # Walk with trajectory n→n+1, starting at n=1, for 5 steps
 # This computes: M(1) · M(2) · M(3) · M(4) · M(5)
-result = m.walk(
+m.walk(
     trajectory={n: 1},    # Increment n by 1 each step
     iterations=5,         # Do 5 multiplications
     start={n: 1}          # Start at n=1
 )
-
-print("Result of 5-step walk:")
-print(result)
-print(f"\nDeterminant: {result.det()}")
+#^^^ why not call it start-step-(count?)
 ```
 
-**Batched Walks (Efficient!):**
+#### Batched Walks (Efficient!):
+
 
 Instead of calling `walk()` multiple times, use a list of iterations. This reuses intermediate results and is **much faster**.
 
 ```python
 m = Matrix([[0, n], [1, n]])
+depths = [5, 10, 20, 50]
 
 # Evaluate at depths 5, 10, 20, 50 all at once
 results = m.walk(
     trajectory={n: 1},
-    iterations=[5, 10, 20, 50],  # List of depths!
+    iterations=depths,
     start={n: 1}
 )
+{d: r for d, r in zip(depths, results)}
+```
 
-print("Batched walk results:")
-for i, depth in enumerate([5, 10, 20, 50]):
-    r = results[i]
-    print(f"\nDepth {depth}:")
-    print(f"  Matrix determinant: {r.det()}")
+```python
+# <<< any way to calulate the ratio with mpf for perscision?
+{d: sp.N(r[1,1]/r[0,1]) for d, r in zip(depths, results)}
+# <<< it can be proven that this series relates to the PCF `...` and converge to e. 
+# <<< other important known Matrices are ...
 ```
 
 **Multi-dimensional Walks:**
@@ -233,71 +298,99 @@ print(result_diag)
 
 **Key Takeaway:** The `walk()` operation is how we compute continued fractions and analyze convergence. Always use batched evaluation with lists for efficiency.
 
----
 
 ## Module 3: Polynomial Continued Fractions
 
+
 PCFs are the primary research objects in ramanujantools. They represent continued fractions where the terms are polynomials.
 
+
 ### Mathematical Background
+
 
 A **Polynomial Continued Fraction (PCF)** has the form:
 
 ```
 a₀ + b₁/(a₁ + b₂/(a₂ + b₃/(a₃ + ...)))
 ```
+<<< this should be a nice latex
 
-where `a_n` and `b_n` are polynomials in n.
+where $a_n$ and $b_n$ are polynomials in $n$.
+
 
 ### Lesson 3.1: The Golden Ratio
 
-The simplest possible PCF converges to the golden ratio φ.
+
+<<<REPHRASE this cell
+
+The simplest possible PCF is:
+
+$1 + \cfrac{1}{1 + \cfrac{1}{1 + \cfrac{1}{\ddots + \cfrac{1}{1}}}}$
+
+i.e. $a_n = b_n = 1$
+
+since the limit fulfill $φ = 1 + \cfrac{1}{φ}$ it converges to the golden ratio φ.
 
 ```python
-# PCF(1, 1) represents: 1 + 1/(1 + 1/(1 + 1/(1 + ...)))
-golden = PCF(a_n=1, b_n=1)
+# we represent this PCF with PCF(1, 1)
+golden = PCF(1, 1)
+golden
+```
 
-print("PCF for golden ratio:")
-print(f"a_n = {golden.a_n}")
-print(f"b_n = {golden.b_n}")
+```python
+golden.a_n, golden.b_n
+```
 
+```python
 # Evaluate at increasing depths
-print("\nConvergence to golden ratio:")
-for depth in [5, 10, 20, 50]:
-    limit = golden.limit(iterations=depth, start=1)
-    value = float(limit.as_float())
-    print(f"Depth {depth:3d}: {value:.15f}")
+depths = [5, 10, 20, 50]
+limits = golden.limit(iterations=depths, start=1)
+{d: limit.as_float() for d, limit in zip(depths, limits)}
+```
 
+```python
 # Compare with actual golden ratio
-actual = (1 + 5**0.5) / 2
-print(f"\nActual φ:   {actual:.15f}")
-```
-
-**Output:**
-```
-Depth   5: 1.625000000000000
-Depth  10: 1.617977528089888
-Depth  20: 1.618033963166707
-Depth  50: 1.618033988749895
-Actual φ:   1.618033988749895
+(1 + 5**0.5) / 2
 ```
 
 ### Lesson 3.2: The Famous e Formula
 
+
 One of the most beautiful continued fractions converges to Euler's number e.
+
+$0 + \cfrac{1}{1 + \cfrac{2}{2 + \cfrac{3}{\ddots + \cfrac{n}{n}}}}$
+
+
+```python
+PCF(n, n)
+```
 
 ```python
 # PCF(n, n) gives a beautiful formula for e
-pcf_e = PCF(a_n=n, b_n=n)
+pcf_e = PCF(n, n)
+```
 
-print("PCF for e:")
-print(f"a_n = {pcf_e.a_n}")
-print(f"b_n = {pcf_e.b_n}")
+```python
+'{:,._}'.format(123456789.123456789)
 
+```
+
+```python
+f"{1220.123456:,._}"
+```
+
+```python
+f"{1220.123456:.50}"
+```
+
+```python
 # Evaluate with batched iterations
 depths = [10, 20, 50, 100]
 limits = pcf_e.limit(depths, start=1)
+{d: f"{limit.as_float():.,} ({limit.precision()} digits accurate)" for d, limit in zip(depths, limits)}
+```
 
+```python
 print("\nConvergence to e:")
 for i, depth in enumerate(depths):
     value = float(limits[i].as_float())
