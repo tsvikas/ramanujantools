@@ -80,6 +80,8 @@ Import the core classes you'll use throughout:
 # Core imports - you'll use these constantly
 from ramanujantools import Position, Matrix, Limit, LinearRecurrence, PCF, CMF, known_cmfs
 
+import mpmath
+
 # Sympy for symbolic math
 import sympy as sp
 from sympy.abc import x, y, z, n
@@ -321,21 +323,15 @@ where $a_n$ and $b_n$ are polynomials in $n$.
 ### Lesson 3.1: The Golden Ratio
 
 
-<<<REPHRASE this cell
-
-The simplest possible PCF is:
-
-$1 + \cfrac{1}{1 + \cfrac{1}{1 + \cfrac{1}{\ddots + \cfrac{1}{1}}}}$
-
-i.e. $a_n = b_n = 1$
-
-since the limit fulfill $φ = 1 + \cfrac{1}{φ}$ it converges to the golden ratio φ.
+The simplest possible PCF is $a_n = b_n = 1$ i.e.:
 
 ```python
 # we represent this PCF with PCF(1, 1)
 golden = PCF(1, 1)
 golden
 ```
+
+since the limit fulfill $φ = 1 + \cfrac{1}{φ}$ it converges to the golden ratio φ.
 
 ```python
 golden.a_n, golden.b_n
@@ -358,36 +354,20 @@ limits = golden.limit(iterations=depths, start=1)
 
 One of the most beautiful continued fractions converges to Euler's number e.
 
-$0 + \cfrac{1}{1 + \cfrac{2}{2 + \cfrac{3}{\ddots + \cfrac{n}{n}}}}$
-
-
 ```python
-PCF(n, n)
-```
-
-```python
-# PCF(n, n) gives a beautiful formula for e
 pcf_e = PCF(n, n)
-```
-
-```python
-'{:,._}'.format(123456789.123456789)
-
-```
-
-```python
-f"{1220.123456:,._}"
-```
-
-```python
-f"{1220.123456:.50}"
+pcf_e
 ```
 
 ```python
 # Evaluate with batched iterations
 depths = [10, 20, 50, 100]
 limits = pcf_e.limit(depths, start=1)
-{d: f"{limit.as_float():.,} ({limit.precision()} digits accurate)" for d, limit in zip(depths, limits)}
+{d: f"{1/limit.as_float()} ({limit.precision()} digits accurate)" for d, limit in zip(depths, limits)}
+```
+
+```python
+1/limits[-1].as_float() + 1 - mpmath.e 
 ```
 
 ```python
@@ -398,7 +378,6 @@ for i, depth in enumerate(depths):
     print(f"Depth {depth:3d}: {value:.15f} ({precision:.1f} digits accurate)")
 
 # Compare with actual e
-import mpmath
 actual_e = float(mpmath.e)
 print(f"\nActual e:   {actual_e:.15f}")
 
