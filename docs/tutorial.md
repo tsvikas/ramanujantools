@@ -78,7 +78,9 @@ Import the core classes you'll use throughout:
 
 ```python
 # Core imports - you'll use these constantly
-from ramanujantools import Position, Matrix, Limit, LinearRecurrence, PCF, CMF, known_cmfs
+from ramanujantools import Position, Matrix, Limit, LinearRecurrence
+from ramanujantools.pcf import PCF
+from ramanujantools.cmf import CMF, known_cmfs
 
 import mpmath
 
@@ -367,23 +369,9 @@ limits = pcf_e.limit(depths, start=1)
 ```
 
 ```python
-1/limits[-1].as_float() + 1 - mpmath.e 
-```
-
-```python
-print("\nConvergence to e:")
-for i, depth in enumerate(depths):
-    value = float(limits[i].as_float())
-    precision = limits[i].precision()
-    print(f"Depth {depth:3d}: {value:.15f} ({precision:.1f} digits accurate)")
-
-# Compare with actual e
-actual_e = float(mpmath.e)
-print(f"\nActual e:   {actual_e:.15f}")
-
-# Check error at depth 100
-error = abs(float(limits[-1].as_float()) - actual_e)
-print(f"Error at depth 100: {error:.2e}")
+with mpmath.workdps(200):
+    display(mpmath.nstr(mpmath.e, 200))
+    display(1/limits[-1].as_float() + 1 - mpmath.e )
 ```
 
 ### Lesson 3.3: More Complex PCFs
@@ -392,20 +380,20 @@ Explore different polynomial patterns:
 
 ```python
 # Example 1: Linear in numerator, quadratic in denominator
-pcf1 = PCF(a_n=2*n + 1, b_n=n**2)
+pcf1 = PCF(2*n + 1, n**2)
 print("PCF(2n+1, n²):")
 limit1 = pcf1.limit(100, start=1)
+print(f"Degrees of pcf1: {pcf1.degrees()}")
 print(f"Converges to: {limit1.as_float()}")
+```
 
+```python
 # Example 2: Different pattern
-pcf2 = PCF(a_n=6*n - 1, b_n=-n*(2*n - 1))
+pcf2 = PCF(6*n - 1, -n*(2*n - 1))
 print("\nPCF(6n-1, -n(2n-1)):")
 limit2 = pcf2.limit(100, start=1)
-print(f"Converges to: {limit2.as_float()}")
-
-# Check the degrees
-print(f"\nDegrees of pcf1: {pcf1.degrees()}")  # (deg(a_n), deg(b_n))
 print(f"Degrees of pcf2: {pcf2.degrees()}")
+print(f"Converges to: {limit2.as_float()}")
 ```
 
 ### Lesson 3.4: Deflation - Cleaning Up PCFs
@@ -414,12 +402,12 @@ PCFs often have common factors that should be removed for canonical form.
 
 ```python
 # Create a PCF with common factors
-pcf_messy = PCF(a_n=2*n**2 + 4*n, b_n=2*n**3)
+pcf_messy = PCF(2*n**2 + 4*n, 2*n**3)
 print("Before deflation:")
 print(f"a_n = {pcf_messy.a_n}")
 print(f"b_n = {pcf_messy.b_n}")
 
-# Remove common factors
+# Remove common factors  <<<this dont work<<<
 pcf_clean = pcf_messy.deflate_all()
 print("\nAfter deflate_all():")
 print(f"a_n = {pcf_clean.a_n}")
@@ -431,7 +419,7 @@ limit_clean = pcf_clean.limit(50, start=1)
 
 print(f"\nMessy converges to: {limit_messy.as_float()}")
 print(f"Clean converges to: {limit_clean.as_float()}")
-print("Same value! ✓")
+print("Same value! ✓")   # <<<not comparing <<<
 ```
 
 ### Lesson 3.5: Understanding PCF Components
